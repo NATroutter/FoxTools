@@ -5,10 +5,11 @@ import {AppSidebar} from "@/components/appSidebar";
 import {Breadcrumbs} from "@/components/breadcrumbs";
 import {Toaster} from "@/components/ui/toaster";
 import {headers} from "next/headers";
+import React from "react";
 
 async function getHost() : Promise<string> {
 	const headerList = await headers();
-	const host = headerList.get("x-host");
+	const host = headerList.get("host");
 	return host ? host : "";
 }
 
