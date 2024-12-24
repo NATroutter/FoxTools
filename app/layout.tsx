@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 	},
 	openGraph: {
 		images: {
-			url: "https://"  +(await getHost())+ "/images/logo.png",
+			url: "http://"  +(await getHost())+ "/images/logo.png",
 			secureUrl: "https://" +(await getHost())+ "/images/logo.png",
 		},
 		type: "website",
