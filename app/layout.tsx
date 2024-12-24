@@ -12,38 +12,42 @@ async function getHost() : Promise<string> {
 	return host ? host : "";
 }
 
-export const metadata: Metadata = {
-    title: {
-        template: 'FoxTools | %s',
-        default: 'FoxTools',
-    },
-	keywords: ["tools", "foxtools"],
-    authors: [{ name: "NATroutter", url: "https://natroutter.fi" },],
-    description: "FoxTools is a collection of different kind of tools to make life easier!",
-    manifest: "/site.webmanifest",
-	icons: {
-		apple: [{ url: "/images/favicon/apple-touch-icon.png", sizes: "180x180" }],
-		icon: [
-			{ url: "/images/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
-			{ url: "/images/favicon/favicon.svg", sizes: "96x96", type: "image/svg+xml" }
-		],
-		shortcut: [{ url: "/images/favicon/favicon.ico" }],
-	},
-	openGraph: {
-		images: {
-			url: "http://"  +(await getHost())+ "/images/logo.png",
-			secureUrl: "https://" +(await getHost())+ "/images/logo.png",
-		},
-		type: "website",
+export async function generateMetadata(): Promise<Metadata> {
+	const host = await getHost();
+
+	return {
 		title: {
 			template: 'FoxTools | %s',
 			default: 'FoxTools',
 		},
-		url: "https://" + (await getHost()) + "/",
-		siteName: "FoxTools",
-		locale: "en_US"
+		keywords: ["tools", "foxtools"],
+		authors: [{ name: "NATroutter", url: "https://natroutter.fi" },],
+		description: "FoxTools is a collection of different kind of tools to make life easier!",
+		manifest: "/site.webmanifest",
+		icons: {
+			apple: [{ url: "/images/favicon/apple-touch-icon.png", sizes: "180x180" }],
+			icon: [
+				{ url: "/images/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+				{ url: "/images/favicon/favicon.svg", sizes: "96x96", type: "image/svg+xml" }
+			],
+			shortcut: [{ url: "/images/favicon/favicon.ico" }],
+		},
+		openGraph: {
+			images: {
+				url: "http://"  +host+ "/images/logo.png",
+				secureUrl: "https://" +host+ "/images/logo.png",
+			},
+			type: "website",
+			title: {
+				template: 'FoxTools | %s',
+				default: 'FoxTools',
+			},
+			url: "https://" + host + "/",
+			siteName: "FoxTools",
+			locale: "en_US"
+		}
 	}
-};
+}
 
 export const viewport: Viewport = {
     themeColor: '#C48F1BFF',
