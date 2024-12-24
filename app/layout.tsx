@@ -5,6 +5,7 @@ import {AppSidebar} from "@/components/appSidebar";
 import {Breadcrumbs} from "@/components/breadcrumbs";
 import {Toaster} from "@/components/ui/toaster";
 
+
 export const metadata: Metadata = {
     title: {
         template: 'FoxTools | %s',
@@ -32,11 +33,13 @@ export const viewport: Viewport = {
 }
 
 export default function RootLayout({children}: Readonly<{ children: React.ReactNode; }>) {
+	const version = process.env.npm_package_version;
+
     return (
         <html lang="en">
         <body>
         <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar version={version} />
             <SidebarInset className="flex w-full">
                 <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
                     <SidebarTrigger className="-ml-1" />
