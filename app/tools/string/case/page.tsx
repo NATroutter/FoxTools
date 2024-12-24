@@ -82,24 +82,24 @@ export default function CaseConvertTool() {
 
 	return (
 		<>
-			<div className="flex justify-center min-h-[100vh] flex-0 rounded-xl bg-panel md:min-h-min p-2">
+			<div className="flex justify-center flex-0 rounded-xl bg-panel md:min-h-min p-2">
 				<div className="w-full">
 					<h1 className="text-4xl p-4 py-2 text-center">Case Convert</h1>
 					<hr/>
-					<div className="flex gap-2 justify-center pt-4 p-2">
+					<div className="flex justify-center flex-wrap gap-2 pt-4 p-2">
 						<Button onClick={upper}>Upper</Button>
 						<Button onClick={lower}>Lower</Button>
 						<Button onClick={capitalized}>Capitalized</Button>
 						<Button onClick={sentence}>Sentence</Button>
 						<Button onClick={title}>Title</Button>
 					</div>
-					<div className="flex gap-2 justify-center pt-4 p-2">
+					<div className="flex justify-center flex-wrap gap-2 pt-4 p-2">
 						<Button onClick={copy}>{copied ? "Copied!" : "Copy To Clipboard"}</Button>
 						<Button onClick={clear}>Clear</Button>
 					</div>
 				</div>
 			</div>
-			<div className="flex justify-center min-h-[100vh] flex-1 rounded-xl bg-panel md:min-h-min">
+			<div className="flex justify-center flex-1 rounded-xl bg-panel md:min-h-min">
 				<div className="flex w-full h-full flex-col">
 					<h2 className="p-2 pb-0 font-mono">Input:</h2>
 					<textarea

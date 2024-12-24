@@ -33,13 +33,13 @@ export function Combobox({items, onChangeAction} : { items:ComboboxItem[], onCha
 					role="combobox"
 					variant="outline"
 					aria-expanded={open}
-					className="w-[200px] justify-between"
+					className="w-[212px] justify-between"
 				>
 					{selected ? selected.label : items[0].label}
 					<ChevronsUpDown className="opacity-50" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-[200px] p-0">
+			<PopoverContent className="w-[212px] p-0">
 				<Command>
 					<CommandList>
 						<CommandGroup>
@@ -52,6 +52,7 @@ export function Combobox({items, onChangeAction} : { items:ComboboxItem[], onCha
 										if (onChangeAction) {
 											onChangeAction(currentValue === item.value ? item : items[0])
 										}
+
 										setOpen(false)
 									}}
 								>

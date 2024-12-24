@@ -26,30 +26,28 @@ export function AppSidebar({ version }: {version: string|undefined }) {
 	return (
 		<Sidebar>
 			<SidebarHeader>
-				<SidebarMenuItem>
-					<SidebarMenuButton size="lg" asChild className="rounded-[5px]">
-						<Link href="/">
-							<div className="flex aspect-square size-8 items-center justify-center rounded-[5px] text-sidebar-primary-foreground">
-								<Image
-									className="w-full aspect-square"
-									src="/images/logo.png"
-									alt="logo"
-									sizes="100vw"
-									width={0}
-									height={0}
-									style={{
-										width: '100%',
-										height: '100%',
-									}}
-								/>
-							</div>
-							<div className="flex flex-col gap-0.5 leading-none">
-								<span className="font-semibold">FoxTools</span>
-								<span className="">v{version}</span>
-							</div>
-						</Link>
-					</SidebarMenuButton>
-				</SidebarMenuItem>
+				<SidebarMenuButton size="lg" asChild className="rounded-[5px]">
+					<Link href="/">
+						<div className="flex aspect-square size-8 items-center justify-center rounded-[5px] text-sidebar-primary-foreground">
+							<Image
+								className="w-full aspect-square"
+								src="/images/logo.png"
+								alt="logo"
+								sizes="100vw"
+								width={0}
+								height={0}
+								style={{
+									width: '100%',
+									height: '100%',
+								}}
+							/>
+						</div>
+						<div className="flex flex-col gap-0.5 leading-none">
+							<span className="font-semibold">FoxTools</span>
+							<span className="">v{version}</span>
+						</div>
+					</Link>
+				</SidebarMenuButton>
 			</SidebarHeader>
 			<SidebarContent>
 				{getNavigator().map((item) => (

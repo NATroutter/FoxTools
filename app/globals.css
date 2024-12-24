@@ -56,7 +56,6 @@ body {
   min-height: 100vh;
   font-family: "Nunito", sans-serif;
   font-weight: 400;
-  overflow-y: hidden;
 }
 
 @layer base {
@@ -78,7 +77,13 @@ body {
   .hiddenInput:focus,
   .hiddenInput:focus-within,
   .hiddenInput:focus-visible,
-  .hiddenInput:target {
+  .hiddenInput:target,
+  .no-outline:active,
+  .no-outline:hover,
+  .no-outline:focus,
+  .no-outline:focus-within,
+  .no-outline:focus-visible,
+  .no-outline:target{
     @apply outline-none;
   }
 }

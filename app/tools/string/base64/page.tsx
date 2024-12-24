@@ -101,7 +101,7 @@ export default function Base64Tool() {
 
 	return (
 		<>
-			<div className="flex justify-center min-h-[100vh] flex-0 rounded-xl bg-panel md:min-h-min p-2">
+			<div className="flex justify-center flex-0 rounded-xl bg-panel md:min-h-min p-2">
 				<div className="w-full">
 					<h1 className="text-4xl p-4 py-2 text-center">Base64 Coder</h1>
 					<hr/>
@@ -113,7 +113,7 @@ export default function Base64Tool() {
 						</div>
 						<Slider defaultValue={[1]} min={1} max={100} step={1} onValueChange={(e) => setLayers(e[0])} value={[layers]}/>
 					</div>
-					<div className="flex gap-2 justify-center">
+					<div className="flex gap-2 justify-center flex-wrap">
 						<Button className="w-20" disabled={encoding || decoding} onClick={encode}>{encoding ? <Spinner/> : "Encode"}</Button>
 						<Button className="w-20" disabled={encoding || decoding} onClick={decode}>{decoding ? <Spinner/> : "Decode"}</Button>
 						<Button className="w-20" disabled={encoding || decoding} onClick={OutToIn}>Out to In</Button>
@@ -121,7 +121,7 @@ export default function Base64Tool() {
 					</div>
 				</div>
 			</div>
-			<div className="flex justify-center min-h-[100vh] flex-1 rounded-xl bg-panel md:min-h-min">
+			<div className="flex justify-center flex-1 rounded-xl bg-panel md:min-h-min">
 
 				<ResizablePanelGroup direction="horizontal" className="flex flex-col">
 					<ResizablePanel className="flex w-full h-full flex-col">

@@ -4,7 +4,13 @@ import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sid
 import {AppSidebar} from "@/components/appSidebar";
 import {Breadcrumbs} from "@/components/breadcrumbs";
 import {Toaster} from "@/components/ui/toaster";
+import {headers} from "next/headers";
 
+async function getHost() {
+	const headerList = await headers();
+	const host = headerList.get("x-host");
+	return host ? host : "";
+}
 
 export const metadata: Metadata = {
     title: {
@@ -22,6 +28,20 @@ export const metadata: Metadata = {
 			{ url: "/images/favicon/favicon.svg", sizes: "96x96", type: "image/svg+xml" }
 		],
 		shortcut: [{ url: "/images/favicon/favicon.ico" }],
+	},
+	openGraph: {
+		images: {
+			url: "https://" + getHost() + "/images/logo.png",
+			secureUrl: "https://" + getHost() + "/images/logo.png",
+		},
+		type: "website",
+		title: {
+			template: 'FoxTools | %s',
+			default: 'FoxTools',
+		},
+		url: "https://" + getHost() + "/",
+		siteName: "FoxTools",
+		locale: "en_US"
 	}
 };
 
@@ -32,26 +52,26 @@ export const viewport: Viewport = {
     minimumScale: 1,
 }
 
-export default function RootLayout({children}: Readonly<{ children: React.ReactNode; }>) {
+export default async function RootLayout({children}: Readonly<{ children: React.ReactNode; }>) {
 	const version = process.env.npm_package_version;
 
-    return (
-        <html lang="en">
-        <body>
-        <SidebarProvider>
-            <AppSidebar version={version} />
-            <SidebarInset className="flex w-full">
-                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                    <SidebarTrigger className="-ml-1" />
-                    <Breadcrumbs/>
-                </header>
-                <div className="flex flex-1 flex-col gap-4 p-4 w-full m-auto">
-                    {children}
-                </div>
-            </SidebarInset>
-        </SidebarProvider>
-        <Toaster />
-        </body>
-        </html>
-    );
+	return (
+		<html lang="en">
+		<body>
+		<SidebarProvider>
+			<AppSidebar version={version}/>
+			<SidebarInset className="flex w-full">
+				<header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+					<SidebarTrigger className="-ml-1"/>
+					<Breadcrumbs/>
+				</header>
+				<div className="flex flex-1 flex-col gap-4 p-4 w-full m-auto">
+					{children}
+				</div>
+			</SidebarInset>
+		</SidebarProvider>
+		<Toaster/>
+		</body>
+		</html>
+	);
 }

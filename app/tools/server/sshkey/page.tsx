@@ -40,11 +40,11 @@ export default function SshKey() {
 
 	return (
 		<>
-			<div className="flex justify-center min-h-[100vh] flex-0 rounded-xl bg-panel md:min-h-min p-2">
+			<div className="flex justify-center flex-0 rounded-xl bg-panel md:min-h-min p-2">
 				<div className="w-full">
 					<h1 className="text-4xl p-4 py-2 text-center">SSH Key Setup</h1>
 					<hr/>
-					<div className="flex gap-2 justify-center pt-4 p-2">
+					<div className="flex justify-center flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col">
 							<Label htmlFor="email">Username</Label>
 							<Input onChange={(e) => setUsername(e.target.value.trim())} value={username}/>
@@ -58,7 +58,7 @@ export default function SshKey() {
 							<Input onChange={(e) => setHostname(e.target.value.trim())} value={hostname}/>
 						</div>
 					</div>
-					<div className="flex gap-2 justify-center pt-4 p-2">
+					<div className="flex justify-center flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col">
 							<Label htmlFor="email">System</Label>
 							<Combobox items={systems} onChangeAction={(e) => setSystem(e)}/>
