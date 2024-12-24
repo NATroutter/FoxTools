@@ -6,7 +6,7 @@ import {Breadcrumbs} from "@/components/breadcrumbs";
 import {Toaster} from "@/components/ui/toaster";
 import {headers} from "next/headers";
 
-async function getHost() {
+async function getHost() : Promise<string> {
 	const headerList = await headers();
 	const host = headerList.get("x-host");
 	return host ? host : "";
@@ -31,15 +31,15 @@ export const metadata: Metadata = {
 	},
 	openGraph: {
 		images: {
-			url: "https://" + getHost() + "/images/logo.png",
-			secureUrl: "https://" + getHost() + "/images/logo.png",
+			url: "https://"  +(await getHost())+ "/images/logo.png",
+			secureUrl: "https://" +(await getHost())+ "/images/logo.png",
 		},
 		type: "website",
 		title: {
 			template: 'FoxTools | %s',
 			default: 'FoxTools',
 		},
-		url: "https://" + getHost() + "/",
+		url: "https://" + (await getHost()) + "/",
 		siteName: "FoxTools",
 		locale: "en_US"
 	}
