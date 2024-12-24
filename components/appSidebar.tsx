@@ -14,7 +14,6 @@ import {
 	SidebarMenuItem,
 	SidebarRail,
 } from "@/components/ui/sidebar"
-import {GalleryVerticalEnd} from "lucide-react";
 import Image from "next/image";
 import {usePathname} from "next/navigation";
 import getNavigator from "@/config/sidenav";
