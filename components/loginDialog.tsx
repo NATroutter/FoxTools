@@ -9,14 +9,12 @@ import Turnstile, {useTurnstile} from "react-turnstile";
 import {useToast} from "@/hooks/use-toast";
 import {Spinner} from "@/components/ui/Spinner";
 
-export function LoginDialog() {
+export function LoginDialog({siteKey} : {siteKey:string}) {
 	const [password, setPassword] = useState<string>()
 	const [captcha, setCaptcha] = useState<string>()
 	const { toast } = useToast()
 
 	const turnstile = useTurnstile();
-
-	const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY;
 
 	const login = async () => {
 		const response = await fetch('/api/auth', {

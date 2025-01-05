@@ -64,6 +64,7 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({children}: Readonly<{ children: React.ReactNode; }>) {
 	const version = process.env.npm_package_version;
+	const sitekey = process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY;
 
 	const authed:boolean = await isAuthenticated()
 
@@ -85,7 +86,7 @@ export default async function RootLayout({children}: Readonly<{ children: React.
 						</div>
 					</header>
 
-					<LoginDialog/>
+					<LoginDialog siteKey={sitekey as string}/>
 				</Dialog>
 				<div className="flex flex-1 flex-col gap-4 p-4 w-full m-auto">
 					{children}
