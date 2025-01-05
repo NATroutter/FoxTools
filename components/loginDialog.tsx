@@ -36,7 +36,7 @@ export function LoginDialog({siteKey} : {siteKey:string}) {
 					setTimeout(() => {
 						window.location.reload();
 					}, 1000);
-					break;
+					return;
 				default:
 					toast({
 						title: data.title,
@@ -57,19 +57,14 @@ export function LoginDialog({siteKey} : {siteKey:string}) {
 				<div className="flex flex-col items-center">
 					<Input className="mb-2 w-[300px]" placeholder="password..." type="password" onChange={(e) => setPassword(e.target.value)}></Input>
 
-					{siteKey ? (
-						<Turnstile
-							sitekey={siteKey}
-							theme={"dark"}
-							onVerify={(token) => {
-								setCaptcha(token);
-							}}
-						/>
-					) : (
-						<div className="bg-[#232323] border-[#797979] w-full h-[65px] mb-2 p-3 gap-[7px] box-border flex items-center border select-none border-spacing-0">
-							<Spinner/> <p>Loading captcha...</p>
-						</div>
-					)}
+					<Turnstile
+						sitekey={siteKey}
+						theme={"dark"}
+						onVerify={(token) => {
+							setCaptcha(token);
+						}}
+					/>
+
 					<Button className="w-[300px]" onClick={login}>Login</Button>
 				</div>
 			</DialogHeader>
