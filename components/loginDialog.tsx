@@ -7,7 +7,6 @@ import {Button} from "@/components/ui/button";
 import React, {useState} from "react";
 import Turnstile from "react-turnstile";
 import {useToast} from "@/hooks/use-toast";
-import {cookies} from "next/headers";
 
 export function LoginDialog() {
 	const [password, setPassword] = useState<string>()
