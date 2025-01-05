@@ -7,6 +7,7 @@ import {Button} from "@/components/ui/button";
 import React, {useState} from "react";
 import Turnstile, {useTurnstile} from "react-turnstile";
 import {useToast} from "@/hooks/use-toast";
+import {Spinner} from "@/components/ui/Spinner";
 
 export function LoginDialog() {
 	const [password, setPassword] = useState<string>()
@@ -16,7 +17,6 @@ export function LoginDialog() {
 	const turnstile = useTurnstile();
 
 	const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY;
-	console.log("Site Key:", siteKey);
 
 	const login = async () => {
 		const response = await fetch('/api/auth', {
@@ -58,14 +58,20 @@ export function LoginDialog() {
 				<DialogDescription/>
 				<div className="flex flex-col items-center">
 					<Input className="mb-2 w-[300px]" placeholder="password..." type="password" onChange={(e) => setPassword(e.target.value)}></Input>
-					<Turnstile
-						sitekey={siteKey as string}
-						theme={"dark"}
-						onVerify={(token) => {
-							setCaptcha(token)
-						}}
 
-					/>
+					{siteKey ? (
+						<Turnstile
+							sitekey={siteKey}
+							theme={"dark"}
+							onVerify={(token) => {
+								setCaptcha(token);
+							}}
+						/>
+					) : (
+						<div className="bg-[#232323] border-[#797979] w-full h-[65px] mb-2 p-3 gap-[7px] box-border flex items-center border select-none border-spacing-0">
+							<Spinner/> <p>Loading captcha...</p>
+						</div>
+					)}
 					<Button className="w-[300px]" onClick={login}>Login</Button>
 				</div>
 			</DialogHeader>
