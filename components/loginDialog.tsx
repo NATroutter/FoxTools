@@ -15,10 +15,11 @@ export function LoginDialog() {
 
 	const turnstile = useTurnstile();
 
-	const sitekey = process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY;
+	const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY;
+	console.log("Site Key:", siteKey);
 
 	const login = async () => {
-				const response = await fetch('/api/auth', {
+		const response = await fetch('/api/auth', {
 			method: 'POST',
 			body: JSON.stringify({
 				password: password,
@@ -58,7 +59,7 @@ export function LoginDialog() {
 				<div className="flex flex-col items-center">
 					<Input className="mb-2 w-[300px]" placeholder="password..." type="password" onChange={(e) => setPassword(e.target.value)}></Input>
 					<Turnstile
-						sitekey={sitekey as string}
+						sitekey={siteKey as string}
 						theme={"dark"}
 						onVerify={(token) => {
 							setCaptcha(token)
