@@ -19,7 +19,7 @@ import {usePathname} from "next/navigation";
 import getNavigator from "@/config/sidenav";
 import Link from "next/link";
 
-export function AppSidebar({ version }: {version: string|undefined }) {
+export function AppSidebar({ version, authed }: {version: string|undefined, authed:boolean }) {
 
 	const path = usePathname()
 
@@ -50,7 +50,7 @@ export function AppSidebar({ version }: {version: string|undefined }) {
 				</SidebarMenuButton>
 			</SidebarHeader>
 			<SidebarContent>
-				{getNavigator().map((item) => (
+				{getNavigator(authed).map((item) => (
 					<SidebarGroup key={item.title}>
 						<SidebarGroupLabel>{item.title}</SidebarGroupLabel>
 						<SidebarGroupContent>

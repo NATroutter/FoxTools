@@ -6,6 +6,11 @@ import {Breadcrumbs} from "@/components/breadcrumbs";
 import {Toaster} from "@/components/ui/toaster";
 import {headers} from "next/headers";
 import React from "react";
+import {Dialog,  DialogTrigger} from "@/components/ui/dialog";
+import {FiLogIn,} from "react-icons/fi";
+import {LoginDialog} from "@/components/loginDialog";
+import {LogoutButton} from "@/components/logoutButton";
+import {isAuthenticated} from "@/lib/auth";
 
 async function getHost() : Promise<string> {
 	const headerList = await headers();
@@ -60,16 +65,28 @@ export const viewport: Viewport = {
 export default async function RootLayout({children}: Readonly<{ children: React.ReactNode; }>) {
 	const version = process.env.npm_package_version;
 
+	const authed:boolean = await isAuthenticated()
+
 	return (
 		<html lang="en">
 		<body>
 		<SidebarProvider>
-			<AppSidebar version={version}/>
+			<AppSidebar version={version} authed={authed}/>
 			<SidebarInset className="flex w-full">
-				<header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-					<SidebarTrigger className="-ml-1"/>
-					<Breadcrumbs/>
-				</header>
+
+				<Dialog>
+					<header className="flex flex-row justify-between items-center gap-2 border-b px-4">
+						<div className="flex flex-row h-16 shrink-0 items-center">
+							<SidebarTrigger className="-ml-1"/>
+							<Breadcrumbs/>
+						</div>
+						<div className="flex items-center">
+							{authed ? <LogoutButton/> : <DialogTrigger><FiLogIn /></DialogTrigger>}
+						</div>
+					</header>
+
+					<LoginDialog/>
+				</Dialog>
 				<div className="flex flex-1 flex-col gap-4 p-4 w-full m-auto">
 					{children}
 				</div>

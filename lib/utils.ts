@@ -1,8 +1,60 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+const {TURNSTILE_SECRET} = process.env
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+export function getDaysAndHours(totalHours: number): string {
+  const days = Math.floor(totalHours / 24); // Calculate the number of days
+  const hours = totalHours % 24; // Calculate the remaining hours
+
+  if (days > 0) {
+    // If there are days, show them and only show hours if there are any
+    return `${days} day${days > 1 ? 's' : ''}${hours > 0 ? ' and ' + hours + ' hour' + (hours !== 1 ? 's' : '') : ''}`;
+  } else {
+    // If there are no days, show only the hours
+    return `${hours} hour${hours !== 1 ? 's' : ''}`;
+  }
+}
+
+export function formatCurrency(value:number) : string {
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+export function getTimestamp() : string {
+  const pad = (n: number,s=2) => (`${new Array(s).fill(0)}${n}`).slice(-s);
+  const d = new Date();
+
+  return `${pad(d.getFullYear(),4)}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+export function getUserIP(request: Request) : string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip');
+
+  const headers = new Headers(request.headers);
+  const proxyIP = headers.get('x-forwarded-for');
+
+  return ip || proxyIP || 'IP not found';
+}
+
+export async function validateCaptcha(token:string) : Promise<boolean> {
+  const data = new FormData();
+  data.append("secret", TURNSTILE_SECRET as string);
+  data.append("response", token);
+  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    body: data,
+    method: "POST",
+  });
+  const result = await res.json();
+  return result.success;
 }
 
 export function TitleCase(input: string): string {

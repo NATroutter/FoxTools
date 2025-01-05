@@ -11,7 +11,7 @@ interface FindResponse {
 	item: NavItem
 }
 
-const data: NavCategory[] = [
+const publicTools: NavCategory[] = [
 	{
 		title: "Server Tools",
 		items: [
@@ -35,14 +35,31 @@ const data: NavCategory[] = [
 		],
 	}
 ];
+const privateTools: NavCategory[] = [
+	{
+		title: "3D Printing",
+		items: [
+			{
+				name: "Commission Calculator",
+				url: "/tools/3d-printing/commission-calculator",
+			}
+		],
+	}
+];
 
 
-export default function getNavigator() {
-	return data;
+export default function getNavigator(authed?:boolean) {
+	const tools:NavCategory[] = []
+	publicTools.forEach(i=>tools.push(i))
+
+	if (authed) {
+		privateTools.forEach(i=>tools.push(i))
+	}
+	return tools;
 }
 
 export function findEntryByPath(url: string) : FindResponse | null {
-	for (const category of data) {
+	for (const category of privateTools) {
 		for (const item of category.items) {
 			if (item.url === url) {
 				return {
