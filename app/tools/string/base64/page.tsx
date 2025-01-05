@@ -22,7 +22,6 @@ export default function Base64Tool() {
 		if (layerInput.current) {
 			const size = String(layers).length*7.7;
 			layerInput.current.style.width = `${size}px`;
-			console.log(layers.toString().length)
 		}
 	}, [layers]);
 
