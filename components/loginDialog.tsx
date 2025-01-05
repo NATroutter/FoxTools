@@ -7,7 +7,6 @@ import {Button} from "@/components/ui/button";
 import React, {useState} from "react";
 import Turnstile, {useTurnstile} from "react-turnstile";
 import {useToast} from "@/hooks/use-toast";
-import {Spinner} from "@/components/ui/Spinner";
 
 export function LoginDialog({siteKey} : {siteKey:string}) {
 	const [password, setPassword] = useState<string>()
