@@ -11,7 +11,6 @@ export async function isAuthenticated() {
 		if (auth && auth.value && auth.value === PRIVATE_TOOL_PASSWORD) {
 			return true
 		}
-		cookie.delete("auth")
 	}
 	return false
 }
