@@ -6,7 +6,7 @@ services:
     environment:
       - PRIVATE_TOOL_PASSWORD=change_me
       - TURNSTILE_SECRET=change_me
-      - NEXT_PUBLIC_TURNSTILE_SITEKEY=change_me
+      - TURNSTILE_SITEKEY=change_me
     ports:
       - 127.0.0.1:8400:3000
       #- 8400:3000
