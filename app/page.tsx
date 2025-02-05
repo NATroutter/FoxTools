@@ -10,3 +10,11 @@ export default function Home() {
       </div>
   );
 }
+
+
+// Ideas
+// string to bytes - bytes to string
+// string url encoder
+// reverse string
+// get string lenght
+// Advanced text replace with variables

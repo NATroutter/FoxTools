@@ -60,7 +60,7 @@ export default function SshKey() {
 					</div>
 					<div className="flex justify-center flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col">
-							<Label htmlFor="email">System</Label>
+							<Label htmlFor="email">Local System</Label>
 							<Combobox items={systems} onChangeAction={(e) => setSystem(e)}/>
 						</div>
 						<div className="flex flex-col">
@@ -82,7 +82,7 @@ export default function SshKey() {
 						<div className="p-1">
 							<h4>Copy ssh key to server:</h4>
 							<Code lang="powershell">
-								{`${system.value == "windows" ? ("type $env:USERPROFILE\\.ssh\\id_rsa-" + hostname.toLowerCase() + ".pub | ssh " + username + "@" + address + " \"mkdir .ssh && cat >> .ssh/authorized_keys\"") : ("ssh-copy-id -i ~/.ssh/id_rsa-" + hostname.toLowerCase() + ".pub " + username + "@" + address)}`}
+								{`${system.value == "windows" ? ("type $env:USERPROFILE\\.ssh\\id_rsa-" + hostname.toLowerCase() + ".pub | ssh " + username + "@" + address + " \"if [ ! -d ~/.ssh ]; then mkdir -p ~/.ssh; fi && cat >> ~/.ssh/authorized_keys\"") : ("ssh-copy-id -i ~/.ssh/id_rsa-" + hostname.toLowerCase() + ".pub " + username + "@" + address)}`}
 							</Code>
 						</div>
 						<div className="p-1">
