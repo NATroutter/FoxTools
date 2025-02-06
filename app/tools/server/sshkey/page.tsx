@@ -1,12 +1,13 @@
 'use client'
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Code} from "@/components/code";
 import {Combobox, ComboboxItem} from "@/components/combobox";
+import {setEnvironmentData} from "node:worker_threads";
 
-const editors: ComboboxItem[] = [
+const winEditors: ComboboxItem[] = [
 	{
 		value: "notepad",
 		label: "Notepad",
@@ -14,12 +15,15 @@ const editors: ComboboxItem[] = [
 	{
 		value: "code",
 		label: "VS Code",
-	},
+	}
+]
+const linuxEditors: ComboboxItem[] = [
 	{
 		value: "nano",
 		label: "Nano",
 	},
 ]
+
 const systems: ComboboxItem[] = [
 	{
 		value: "windows",
@@ -32,11 +36,13 @@ const systems: ComboboxItem[] = [
 ]
 
 export default function SshKey() {
-	const [editor, setEditor] = useState<ComboboxItem>(editors[0])
+	const [editorWin, setEditorWin] = useState<ComboboxItem>(winEditors[0])
+	const [editorLinux, setEditorLinux] = useState<ComboboxItem>(linuxEditors[0])
 	const [system, setSystem] = useState<ComboboxItem>(systems[0])
 	const [address, setAddress] = useState<string>("example.com")
 	const [username, setUsername] = useState<string>("root")
 	const [hostname, setHostname] = useState<string>("Debian12")
+
 
 	return (
 		<>
@@ -65,7 +71,10 @@ export default function SshKey() {
 						</div>
 						<div className="flex flex-col">
 							<Label htmlFor="email">Text Editor</Label>
-							<Combobox items={editors} onChangeAction={(e) => setEditor(e)}/>
+							{system.value == "windows" ?
+								(<Combobox items={winEditors} onChangeAction={(e) => setEditorWin(e)} key={1}/>) :
+								(<Combobox items={linuxEditors} onChangeAction={(e) => setEditorLinux(e)} key={2}/>)
+							}
 						</div>
 					</div>
 				</div>
@@ -74,25 +83,28 @@ export default function SshKey() {
 				<div className="flex w-full h-full flex-col">
 					<article className="p-4">
 						<div className="p-1">
-							<h4>Generate new ssh key with command:</h4>
+							<h4>1. {`${system.value == "windows" ? "Open Powershell" : "Open Terminal"}`}</h4>
+						</div>
+						<div className="p-1">
+							<h4>2. Generate new ssh key with command:</h4>
 							<Code lang="powershell">
 								{`ssh-keygen -t rsa -b 4096 -f ${system.value == "windows" ? ("$HOME\\.ssh\\id_rsa-") : ("~/.ssh/id_rsa-")}${hostname.toLowerCase()}`}
 							</Code>
 						</div>
 						<div className="p-1">
-							<h4>Copy ssh key to server:</h4>
+							<h4>3. Copy ssh key to server:</h4>
 							<Code lang="powershell">
 								{`${system.value == "windows" ? ("type $env:USERPROFILE\\.ssh\\id_rsa-" + hostname.toLowerCase() + ".pub | ssh " + username + "@" + address + " \"if [ ! -d ~/.ssh ]; then mkdir -p ~/.ssh; fi && cat >> ~/.ssh/authorized_keys\"") : ("ssh-copy-id -i ~/.ssh/id_rsa-" + hostname.toLowerCase() + ".pub " + username + "@" + address)}`}
 							</Code>
 						</div>
 						<div className="p-1">
-							<h4>Open ssh config:</h4>
+							<h4>4. Open ssh config:</h4>
 							<Code lang="powershell">
-								{`${system.value == "windows" ? ("ac $HOME\\.ssh\\config $null | " + editor.value + " $HOME\\.ssh\\config") : (editor.value + " ~/.ssh/config")}`}
+								{`${system.value == "windows" ? ("ac $HOME\\.ssh\\config $null | " + editorWin.value + " $HOME\\.ssh\\config") : (editorLinux.value + " ~/.ssh/config")}`}
 							</Code>
 						</div>
 						<div className="p-1">
-							<h4>Add this to your ssh config:</h4>
+							<h4>5. Add this to your ssh config:</h4>
 							<Code lang="powershell">
 								{`
 Host ${hostname} 
@@ -104,7 +116,7 @@ Host ${hostname}
 							</Code>
 						</div>
 						<div className="p-1">
-							<h4>Done! now you can connect to your server like this:</h4>
+							<h4>6. Done! now you can connect to your server like this:</h4>
 							<Code lang="powershell">
 								{`ssh ${hostname}`}
 							</Code>
