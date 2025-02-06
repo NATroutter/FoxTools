@@ -1,11 +1,10 @@
 'use client'
 
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Code} from "@/components/code";
 import {Combobox, ComboboxItem} from "@/components/combobox";
-import {setEnvironmentData} from "node:worker_threads";
 
 const winEditors: ComboboxItem[] = [
 	{
