@@ -1,6 +1,7 @@
 interface NavItem {
 	name: string;
 	url: string;
+	private: boolean;
 }
 interface NavCategory {
 	title: string;
@@ -11,13 +12,19 @@ interface FindResponse {
 	item: NavItem
 }
 
-const publicTools: NavCategory[] = [
+export const Tools: NavCategory[] = [
 	{
 		title: "Server Tools",
 		items: [
 			{
 				name: "SSH Key Setup",
 				url: "/tools/server/sshkey",
+				private: false,
+			},
+			{
+				name: "Server MOTD",
+				url: "/tools/server/motd",
+				private: true,
 			}
 		],
 	},
@@ -27,39 +34,39 @@ const publicTools: NavCategory[] = [
 			{
 				name: "Base64 Coder",
 				url: "/tools/string/base64",
+				private: false,
 			},
 			{
 				name: "Case Convert",
 				url: "/tools/string/case",
+				private: false,
 			}
 		],
-	}
-];
-const privateTools: NavCategory[] = [
+	},
 	{
 		title: "3D Printing",
 		items: [
 			{
 				name: "Commission Calculator",
 				url: "/tools/3d-printing/commission-calculator",
+				private: true,
 			}
 		],
 	}
 ];
 
-
-export default function getNavigator(authed?:boolean) {
-	const tools:NavCategory[] = []
-	publicTools.forEach(i=>tools.push(i))
-
-	if (authed) {
-		privateTools.forEach(i=>tools.push(i))
-	}
-	return tools;
+export default function getNavigator(authed: boolean) : NavCategory[] {
+	return Tools.map(category => {
+		const filteredItems = category.items.filter(item => authed || !item.private);
+		return {
+			title: category.title,
+			items: filteredItems
+		};
+	}).filter(category => category.items.length > 0);
 }
 
 export function findEntryByPath(url: string) : FindResponse | null {
-	for (const category of privateTools) {
+	for (const category of Tools) {
 		for (const item of category.items) {
 			if (item.url === url) {
 				return {

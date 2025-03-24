@@ -55,13 +55,13 @@ export function AppSidebar({ version, authed }: {version: string|undefined, auth
 						<SidebarGroupLabel>{item.title}</SidebarGroupLabel>
 						<SidebarGroupContent>
 							<SidebarMenu>
-								{item.items.map((item) => (
+								{item.items.map((item) =>
 									<SidebarMenuItem key={item.name}>
 										<SidebarMenuButton asChild isActive={path == item.url} className={"rounded-[5px]"}>
 											<a href={item.url}>{item.name}</a>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
-								))}
+								)}
 							</SidebarMenu>
 						</SidebarGroupContent>
 					</SidebarGroup>

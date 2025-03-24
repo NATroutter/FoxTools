@@ -69,7 +69,7 @@ export default function SshKey() {
 							<Combobox items={systems} onChangeAction={(e) => setSystem(e)}/>
 						</div>
 						<div className="flex flex-col">
-							<Label htmlFor="email">Text Editor</Label>
+							<Label htmlFor="email">Local Text Editor</Label>
 							{system.value == "windows" ?
 								(<Combobox items={winEditors} onChangeAction={(e) => setEditorWin(e)} key={1}/>) :
 								(<Combobox items={linuxEditors} onChangeAction={(e) => setEditorLinux(e)} key={2}/>)

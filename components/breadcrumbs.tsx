@@ -26,7 +26,7 @@ export function Breadcrumbs() {
 
 					{crumbs.map((item, index, array) => (
 						<BreadcrumEntry
-							item={item}
+							item={item.toLowerCase()}
 							useSeparator={index !== 0 && index !== array.length - 1}
 							key={index}
 						/>

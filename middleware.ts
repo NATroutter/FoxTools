@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {isAuthenticated} from "@/lib/auth";
-
-const privateTools = [
-	"/tools/3d-printing/commission-calculator"
-]
+import {Tools} from "@/config/sidenav";
 
 export async function middleware(request: NextRequest): Promise<NextResponse | void> {
 
 	const url = new URL(request.url)
-	if (privateTools.some(tool => url.pathname.startsWith(tool))) {
+
+	const isPrivate = Tools.some(entry =>
+		entry.items.find(tool => url.pathname.startsWith(tool.url) && tool.private)
+	);
+
+	if (isPrivate) {
 		const authed = await isAuthenticated()
 		if (!authed) {
 			return redirect(request, `/`, 307)
