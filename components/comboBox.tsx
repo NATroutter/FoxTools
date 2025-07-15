@@ -10,6 +10,8 @@ import {
 	CommandGroup,
 	CommandItem,
 	CommandList,
+	CommandInput,
+	CommandEmpty
 } from "@/components/ui/command"
 import {
 	Popover,
@@ -22,7 +24,7 @@ export interface ComboboxItem {
 	value: string,
 	label: string
 }
-export function Combobox({items, onChangeAction} : { items:ComboboxItem[], onChangeAction?: (e:ComboboxItem)=>void }) {
+export function ComboBox({items, onChangeAction} : { items:ComboboxItem[], onChangeAction?: (e:ComboboxItem)=>void }) {
 	const [open, setOpen] = useState(false)
 	const [selected, setSelected] = useState<ComboboxItem>(items[0])
 
@@ -41,7 +43,9 @@ export function Combobox({items, onChangeAction} : { items:ComboboxItem[], onCha
 			</PopoverTrigger>
 			<PopoverContent className="w-[212px] p-0">
 				<Command>
+					<CommandInput placeholder="Search..." />
 					<CommandList>
+						<CommandEmpty>No found.</CommandEmpty>
 						<CommandGroup>
 							{items.map((item) => (
 								<CommandItem

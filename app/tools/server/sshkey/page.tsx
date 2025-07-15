@@ -4,7 +4,7 @@ import {useState} from "react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Code} from "@/components/code";
-import {Combobox, ComboboxItem} from "@/components/combobox";
+import {ComboBox, ComboboxItem} from "@/components/comboBox";
 
 const winEditors: ComboboxItem[] = [
 	{
@@ -66,13 +66,13 @@ export default function SshKey() {
 					<div className="flex justify-center flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col">
 							<Label htmlFor="email">Local System</Label>
-							<Combobox items={systems} onChangeAction={(e) => setSystem(e)}/>
+							<ComboBox items={systems} onChangeAction={(e) => setSystem(e)}/>
 						</div>
 						<div className="flex flex-col">
 							<Label htmlFor="email">Local Text Editor</Label>
 							{system.value == "windows" ?
-								(<Combobox items={winEditors} onChangeAction={(e) => setEditorWin(e)} key={1}/>) :
-								(<Combobox items={linuxEditors} onChangeAction={(e) => setEditorLinux(e)} key={2}/>)
+								(<ComboBox items={winEditors} onChangeAction={(e) => setEditorWin(e)} key={1}/>) :
+								(<ComboBox items={linuxEditors} onChangeAction={(e) => setEditorLinux(e)} key={2}/>)
 							}
 						</div>
 					</div>

@@ -7,7 +7,7 @@ import {Button} from "@/components/ui/button";
 import {useToast} from "@/hooks/use-toast";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {formatCurrency, getDaysAndHours} from "@/lib/utils";
-import {Combobox, ComboboxItem} from "@/components/combobox";
+import {ComboBox, ComboboxItem} from "@/components/comboBox";
 
 interface Prints {
 	name: string
@@ -272,7 +272,7 @@ export default function CommissionCalculator() {
 					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col">
 							<Label>Shipping Price</Label>
-							<Combobox items={shippingComboBox()} onChangeAction={(e) => setShipingCost(e)}/>
+							<ComboBox items={shippingComboBox()} onChangeAction={(e) => setShipingCost(e)}/>
 						</div>
 					</div>
 					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
