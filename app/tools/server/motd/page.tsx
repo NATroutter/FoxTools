@@ -338,16 +338,16 @@ export default function MotdSetup() {
 	figlet.defaults({ fontPath: "/fonts/ascii/" });
 
 	useEffect(() => {
-		figlet.text(title, {
-			font: font.value,
-			horizontalLayout: "default",
-			verticalLayout: "default",
-			width: 80,
-			whitespaceBreak: true,
-		}, (err,data)=> {
-			setAscii(data);
-		})
-	}, [setAscii, title,font]);
+		// figlet.text(title, {
+		// 	font: font.value,
+		// 	horizontalLayout: "default",
+		// 	verticalLayout: "default",
+		// 	width: 80,
+		// 	whitespaceBreak: true,
+		// }, (err,data)=> {
+		// 	setAscii(data);
+		// })
+	}, [setAscii, title,font, mainColor]);
 
 	return (
 		<>
