@@ -87,7 +87,6 @@ export default function CommissionCalculator() {
 		const kgCost = Number(costPerKg.replace(",", "."))
 		const grams = Number(usedMaterialGrams.replace(",", "."))
 		const _profit = Number(profit.replace(",", "."))
-		const _globalprofit = Number(globalProfit.replace(",", "."))
 
 		if (isNaN(time)) {
 			toast({
@@ -129,17 +128,9 @@ export default function CommissionCalculator() {
 			})
 			return undefined;
 		}
-		if (isNaN(_globalprofit)) {
-			toast({
-				title: "Invalid input!",
-				description: "Profit (Global) is not a number",
-				variant: "error"
-			})
-			return undefined;
-		}
 
 		const material = (kgCost * grams) / 1000;
-		return {time,usage,material,profit: _profit,globalprofit: _globalprofit};
+		return {time,usage,material,profit: _profit};
 	}
 
 	const savePrint = () => {
@@ -246,10 +237,11 @@ export default function CommissionCalculator() {
 
 			//Add shipping price
 			if (shipingCost.value === "Custom") {
-				const customPrice = Number(customShippingPrice);
+				const customPrice = Number(customShippingPrice.replace(",", "."));
 				if (!isNaN(customPrice) && customPrice > 0) {
 					totalCost += customPrice;
 				}
+				// If invalid, treat as 0 (don't set state during render)
 			} else {
 				const pack = shipingPrices.find(pkg => pkg.name === shipingCost.value);
 				if (pack && pack.price > 0) {
@@ -258,10 +250,11 @@ export default function CommissionCalculator() {
 			}
 
 			//Add global profit
-			const gProfit : number = Number(globalProfit);
-			if (!isNaN(gProfit)) {
+			const gProfit : number = Number(globalProfit.replace(",", "."));
+			if (!isNaN(gProfit) && gProfit > 0) {
 				totalCost += gProfit;
 			}
+			// If invalid, treat as 0 (don't set state during render)
 
 			return formatCurrency(totalCost)
 		}
@@ -286,7 +279,7 @@ export default function CommissionCalculator() {
 					</div>
 					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col">
-							<Label>Cost per 1kg</Label>
+							<Label>Material cost per 1kg</Label>
 							<Input onChange={(e) => setCostPerKg(e.target.value.trim())} value={costPerKg}/>
 						</div>
 						<div className="flex flex-col">
@@ -402,7 +395,15 @@ export default function CommissionCalculator() {
 							<div className="flex justify-start items-end flex-wrap gap-2 pt-10 p-2">
 								<div className="flex flex-col">
 									<Label>Profit (Global)</Label>
-									<Input onChange={(e) => setGlobalProfit(e.target.value.trim())} value={globalProfit}/>
+									<Input onChange={(e) => {
+										const value = e.target.value.trim();
+										const num = Number(value.replace(",", "."));
+										if (value === "" || !isNaN(num)) {
+											setGlobalProfit(value);
+										} else {
+											setGlobalProfit("0");
+										}
+									}} value={globalProfit}/>
 								</div>
 								<div className="flex flex-col">
 									<Label>Shipping Price</Label>
@@ -411,7 +412,15 @@ export default function CommissionCalculator() {
 								{shipingCost.value === "Custom" && (
 									<div className="flex flex-col">
 										<Label>Custom Shipping Price</Label>
-										<Input onChange={(e) => setCustomShippingPrice(e.target.value.trim())} value={customShippingPrice}/>
+										<Input onChange={(e) => {
+											const value = e.target.value.trim();
+											const num = Number(value.replace(",", "."));
+											if (value === "" || !isNaN(num)) {
+												setCustomShippingPrice(value);
+											} else {
+												setCustomShippingPrice("0");
+											}
+										}} value={customShippingPrice}/>
 									</div>
 								)}
 							</div>
