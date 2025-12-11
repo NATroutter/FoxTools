@@ -14,6 +14,8 @@ interface Prints {
 	printTime: number,
 	usageCost: number,
 	materialCost: number,
+	costPerKg: number,
+	usedMaterialGrams: number,
 	profit: number
 }
 interface Package {
@@ -27,35 +29,39 @@ const shipingPrices: Package[] = [
 		price: 0
 	},
 	{
+		name: "Custom",
+		price: 0
+	},
+	{
 		name: "XXS (3x25x35)",
-		price: 5.90
+		price: 6.90
 	},
 	{
 		name: "XS (11x32x42)",
-		price: 7.90
+		price: 8.90
 	},
 	{
 		name: "M (19x36x60)",
-		price: 9.90
+		price: 10.90
 	},
 	{
 		name: "L (36x37x60)",
-		price: 11.90
+		price: 14.90
 	},
 	{
 		name: "XL (40x60x100)",
-		price: 19.90
+		price: 22.90
 	},
 	{
 		name: "XXL",
-		price: 39.90
+		price: 44.90
 	}
 ]
 
 function shippingComboBox() {
 	const combo: ComboboxItem[] = [];
 	shipingPrices.forEach(i=> combo.push({
-		label: i.name + " - " + i.price + "€",
+		label: i.name === "Custom" ? i.name : i.name + " - " + i.price + "€",
 		value: i.name
 	}))
 	return combo;
@@ -65,20 +71,23 @@ export default function CommissionCalculator() {
 	const [name, setName] = useState<string>("print #1")
 	const [printingTime, setPrintingTime] = useState<string>("1")
 	const [usageCost, setUsageCost] = useState<string>("0.15")
-	const [materialCost, setMaterialCost] = useState<string>("1.70")
+	const [costPerKg, setCostPerKg] = useState<string>("10")
+	const [usedMaterialGrams, setUsedMaterialGrams] = useState<string>("100")
 	const [profit, setProfit] = useState<string>("0")
 	const [globalProfit, setGlobalProfit] = useState<string>("5")
 	const [shipingCost, setShipingCost] = useState<ComboboxItem>(shippingComboBox()[0])
+	const [customShippingPrice, setCustomShippingPrice] = useState<string>("0")
 	const [printList, setPrintList] = useState<Prints[]>([])
 
 	const { toast } = useToast()
 
 	const parseInputs = () => {
-		const time = Number(printingTime)
-		const usage = Number(usageCost)
-		const material = Number(materialCost)
-		const _profit = Number(profit)
-		const _globalprofit = Number(globalProfit)
+		const time = Number(printingTime.replace(",", "."))
+		const usage = Number(usageCost.replace(",", "."))
+		const kgCost = Number(costPerKg.replace(",", "."))
+		const grams = Number(usedMaterialGrams.replace(",", "."))
+		const _profit = Number(profit.replace(",", "."))
+		const _globalprofit = Number(globalProfit.replace(",", "."))
 
 		if (isNaN(time)) {
 			toast({
@@ -96,10 +105,18 @@ export default function CommissionCalculator() {
 			})
 			return undefined;
 		}
-		if (isNaN(material)) {
+		if (isNaN(kgCost)) {
 			toast({
 				title: "Invalid input!",
-				description: "Material cost is not a number",
+				description: "Cost per 1kg is not a number",
+				variant: "error"
+			})
+			return undefined;
+		}
+		if (isNaN(grams)) {
+			toast({
+				title: "Invalid input!",
+				description: "Used material grams is not a number",
 				variant: "error"
 			})
 			return undefined;
@@ -120,6 +137,8 @@ export default function CommissionCalculator() {
 			})
 			return undefined;
 		}
+
+		const material = (kgCost * grams) / 1000;
 		return {time,usage,material,profit: _profit,globalprofit: _globalprofit};
 	}
 
@@ -137,6 +156,8 @@ export default function CommissionCalculator() {
 					printTime: inputs.time,
 					usageCost: inputs.usage,
 					materialCost: inputs.material,
+					costPerKg: Number(costPerKg),
+					usedMaterialGrams: Number(usedMaterialGrams),
 					profit: inputs.profit
 				};
 				toast({
@@ -183,12 +204,15 @@ export default function CommissionCalculator() {
 			printTime: inputs.time,
 			usageCost: inputs.usage,
 			materialCost: inputs.material,
+			costPerKg: Number(costPerKg),
+			usedMaterialGrams: Number(usedMaterialGrams),
 			profit: inputs.profit
 		})
 		setPrintList(prints);
 		setName("print #" + (prints.length + 1))
-		setPrintingTime("")
-		setMaterialCost("")
+		setPrintingTime("1")
+		setCostPerKg("10")
+		setUsedMaterialGrams("100")
 		setProfit("0")
 	}
 
@@ -196,11 +220,13 @@ export default function CommissionCalculator() {
 		setPrintList([])
 		setName("print #0")
 		setPrintingTime("1")
-		setMaterialCost("1.70")
+		setCostPerKg("10")
+		setUsedMaterialGrams("100")
 		setProfit("0")
 		setGlobalProfit("5")
 		setUsageCost("0.15")
 		setShipingCost(shippingComboBox()[0])
+		setCustomShippingPrice("0")
 	}
 
 	function getTotalPrintTime() {
@@ -219,9 +245,16 @@ export default function CommissionCalculator() {
 			})
 
 			//Add shipping price
-			const pack = shipingPrices.find(pkg => pkg.name === shipingCost.value);
-			if (pack && pack.price > 0) {
-				totalCost += pack.price;
+			if (shipingCost.value === "Custom") {
+				const customPrice = Number(customShippingPrice);
+				if (!isNaN(customPrice) && customPrice > 0) {
+					totalCost += customPrice;
+				}
+			} else {
+				const pack = shipingPrices.find(pkg => pkg.name === shipingCost.value);
+				if (pack && pack.price > 0) {
+					totalCost += pack.price;
+				}
 			}
 
 			//Add global profit
@@ -250,9 +283,15 @@ export default function CommissionCalculator() {
 							<Label>Print Time (hours)</Label>
 							<Input onChange={(e) => setPrintingTime(e.target.value.trim())} value={printingTime}/>
 						</div>
+					</div>
+					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col">
-							<Label>Material Cost</Label>
-							<Input onChange={(e) => setMaterialCost(e.target.value.trim())} value={materialCost}/>
+							<Label>Cost per 1kg</Label>
+							<Input onChange={(e) => setCostPerKg(e.target.value.trim())} value={costPerKg}/>
+						</div>
+						<div className="flex flex-col">
+							<Label>Used material (grams)</Label>
+							<Input onChange={(e) => setUsedMaterialGrams(e.target.value.trim())} value={usedMaterialGrams}/>
 						</div>
 					</div>
 					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
@@ -261,20 +300,28 @@ export default function CommissionCalculator() {
 							<Input onChange={(e) => setProfit(e.target.value.trim())} value={profit}/>
 						</div>
 						<div className="flex flex-col">
-							<Label>Profit (Global)</Label>
-							<Input onChange={(e) => setGlobalProfit(e.target.value.trim())} value={globalProfit}/>
-						</div>
-						<div className="flex flex-col">
 							<Label>Usage Cost (per hour)</Label>
 							<Input onChange={(e) => setUsageCost(e.target.value.trim())} value={usageCost}/>
 						</div>
 					</div>
-					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
-						<div className="flex flex-col">
-							<Label>Shipping Price</Label>
-							<ComboBox items={shippingComboBox()} onChangeAction={(e) => setShipingCost(e)}/>
-						</div>
-					</div>
+					{/*<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">*/}
+					{/*	<div className="flex flex-col">*/}
+					{/*		<Label>Usage Cost (per hour)</Label>*/}
+					{/*		<Input onChange={(e) => setUsageCost(e.target.value.trim())} value={usageCost}/>*/}
+					{/*	</div>*/}
+					{/*</div>*/}
+					{/*<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">*/}
+					{/*	<div className="flex flex-col">*/}
+					{/*		<Label>Shipping Price</Label>*/}
+					{/*		<ComboBox items={shippingComboBox()} onChangeAction={(e) => setShipingCost(e)}/>*/}
+					{/*	</div>*/}
+					{/*	{shipingCost.value === "Custom" && (*/}
+					{/*		<div className="flex flex-col">*/}
+					{/*			<Label>Custom Shipping Price</Label>*/}
+					{/*			<Input onChange={(e) => setCustomShippingPrice(e.target.value.trim())} value={customShippingPrice}/>*/}
+					{/*		</div>*/}
+					{/*	)}*/}
+					{/*</div>*/}
 					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col mp-0">
 							<Button onClick={reset}>Reset</Button>
@@ -306,15 +353,16 @@ export default function CommissionCalculator() {
 								<TableRow key={i}>
 									<TableCell className="font-medium">{print.name}</TableCell>
 									<TableCell>{print.printTime}h</TableCell>
-									<TableCell>{print.materialCost}€</TableCell>
-									<TableCell>{print.profit}€</TableCell>
-									<TableCell>{print.usageCost}€</TableCell>
+									<TableCell>{formatCurrency(print.materialCost)}</TableCell>
+									<TableCell>{formatCurrency(print.profit)}</TableCell>
+									<TableCell>{formatCurrency(print.usageCost)}</TableCell>
 									<TableCell className="text-right">
 										<div className="flex gap-1 justify-end">
 											<Button onClick={()=> {
 												setName(print.name)
 												setPrintingTime(String(print.printTime))
-												setMaterialCost(String(print.materialCost))
+												setCostPerKg(String(print.costPerKg))
+												setUsedMaterialGrams(String(print.usedMaterialGrams))
 												setProfit(String(print.profit))
 												setUsageCost(String(print.usageCost))
 											}}>Edit</Button>
@@ -336,6 +384,7 @@ export default function CommissionCalculator() {
 						{/*	</TableRow>*/}
 						{/*</TableFooter>*/}
 					</Table>
+					<hr/>
 					{(printList && printList.length > 0) && (
 						<div className="mt-4">
 							<div className="flex flex-row w-full">
@@ -349,6 +398,22 @@ export default function CommissionCalculator() {
 							<div className="flex flex-row w-full">
 								<h3 className="text-2xl font-mono w-96">Total Price:</h3>
 								<h3 className="text-2xl font-mono w-full">{getCommissionPrice()}</h3>
+							</div>
+							<div className="flex justify-start items-end flex-wrap gap-2 pt-10 p-2">
+								<div className="flex flex-col">
+									<Label>Profit (Global)</Label>
+									<Input onChange={(e) => setGlobalProfit(e.target.value.trim())} value={globalProfit}/>
+								</div>
+								<div className="flex flex-col">
+									<Label>Shipping Price</Label>
+									<ComboBox items={shippingComboBox()} onChangeAction={(e) => setShipingCost(e)}/>
+								</div>
+								{shipingCost.value === "Custom" && (
+									<div className="flex flex-col">
+										<Label>Custom Shipping Price</Label>
+										<Input onChange={(e) => setCustomShippingPrice(e.target.value.trim())} value={customShippingPrice}/>
+									</div>
+								)}
 							</div>
 						</div>
 					)}
