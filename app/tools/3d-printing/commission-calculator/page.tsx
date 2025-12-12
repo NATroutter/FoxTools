@@ -335,6 +335,8 @@ export default function CommissionCalculator() {
 							<TableRow>
 								<TableHead className="w-[100px]">Name</TableHead>
 								<TableHead>Printing Time</TableHead>
+								<TableHead>Material Cost per 1KG</TableHead>
+								<TableHead>Material Used</TableHead>
 								<TableHead>Material Cost</TableHead>
 								<TableHead>Profit</TableHead>
 								<TableHead>Usage Cost</TableHead>
@@ -346,6 +348,8 @@ export default function CommissionCalculator() {
 								<TableRow key={i}>
 									<TableCell className="font-medium">{print.name}</TableCell>
 									<TableCell>{print.printTime}h</TableCell>
+									<TableCell>{formatCurrency(print.costPerKg)}</TableCell>
+									<TableCell>{print.usedMaterialGrams}g</TableCell>
 									<TableCell>{formatCurrency(print.materialCost)}</TableCell>
 									<TableCell>{formatCurrency(print.profit)}</TableCell>
 									<TableCell>{formatCurrency(print.usageCost)}</TableCell>
