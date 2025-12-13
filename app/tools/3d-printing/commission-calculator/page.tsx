@@ -274,56 +274,40 @@ export default function CommissionCalculator() {
 						</div>
 						<div className="flex flex-col">
 							<Label>Print Time (hours)</Label>
-							<Input onChange={(e) => setPrintingTime(e.target.value.trim())} value={printingTime}/>
+							<Input onChange={(e) => setPrintingTime(e.target.value.trim().replace(",","."))} value={printingTime}/>
 						</div>
 					</div>
 					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col">
 							<Label>Material cost per 1kg</Label>
-							<Input onChange={(e) => setCostPerKg(e.target.value.trim())} value={costPerKg}/>
+							<Input onChange={(e) => setCostPerKg(e.target.value.trim().replace(",","."))} value={costPerKg}/>
 						</div>
 						<div className="flex flex-col">
 							<Label>Used material (grams)</Label>
-							<Input onChange={(e) => setUsedMaterialGrams(e.target.value.trim())} value={usedMaterialGrams}/>
+							<Input onChange={(e) => setUsedMaterialGrams(e.target.value.trim().replace(",","."))} value={usedMaterialGrams}/>
 						</div>
 					</div>
 					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
 						<div className="flex flex-col">
 							<Label>Profit</Label>
-							<Input onChange={(e) => setProfit(e.target.value.trim())} value={profit}/>
+							<Input onChange={(e) => setProfit(e.target.value.trim().replace(",","."))} value={profit}/>
 						</div>
 						<div className="flex flex-col">
 							<Label>Usage Cost (per hour)</Label>
-							<Input onChange={(e) => setUsageCost(e.target.value.trim())} value={usageCost}/>
+							<Input onChange={(e) => setUsageCost(e.target.value.trim().replace(",","."))} value={usageCost}/>
 						</div>
 					</div>
-					{/*<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">*/}
-					{/*	<div className="flex flex-col">*/}
-					{/*		<Label>Usage Cost (per hour)</Label>*/}
-					{/*		<Input onChange={(e) => setUsageCost(e.target.value.trim())} value={usageCost}/>*/}
-					{/*	</div>*/}
-					{/*</div>*/}
-					{/*<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">*/}
-					{/*	<div className="flex flex-col">*/}
-					{/*		<Label>Shipping Price</Label>*/}
-					{/*		<ComboBox items={shippingComboBox()} onChangeAction={(e) => setShipingCost(e)}/>*/}
-					{/*	</div>*/}
-					{/*	{shipingCost.value === "Custom" && (*/}
-					{/*		<div className="flex flex-col">*/}
-					{/*			<Label>Custom Shipping Price</Label>*/}
-					{/*			<Input onChange={(e) => setCustomShippingPrice(e.target.value.trim())} value={customShippingPrice}/>*/}
-					{/*		</div>*/}
-					{/*	)}*/}
-					{/*</div>*/}
 					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
-						<div className="flex flex-col mp-0">
-							<Button onClick={reset}>Reset</Button>
-						</div>
 						<div className="flex flex-col mp-0">
 							<Button onClick={addPrint}>Add</Button>
 						</div>
 						<div className="flex flex-col mp-0">
 							<Button onClick={savePrint}>Save</Button>
+						</div>
+					</div>
+					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
+						<div className="flex flex-col mp-0">
+							<Button onClick={reset}>Reset Everything</Button>
 						</div>
 					</div>
 				</div>
