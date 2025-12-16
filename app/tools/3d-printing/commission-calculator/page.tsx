@@ -226,6 +226,15 @@ export default function CommissionCalculator() {
 	function getTotalMaterialCost() {
 		return formatCurrency(printList ? printList.reduce((total, print) => total + print.materialCost, 0) : 0);
 	}
+	function getTotalUsageCost() {
+		return formatCurrency(printList ? printList.reduce((total, print) => total + (print.printTime * print.usageCost), 0) : 0);
+	}
+	function getTotalProfit() {
+		const printsProfit = printList ? printList.reduce((total, print) => total + print.profit, 0) : 0;
+		const gProfit = Number(globalProfit.replace(",", "."));
+		const globalProfitValue = !isNaN(gProfit) && gProfit > 0 ? gProfit : 0;
+		return formatCurrency(printsProfit + globalProfitValue);
+	}
 	function getCommissionPrice() : string {
 		if (printList) {
 			let totalCost:number = 0;
@@ -324,6 +333,7 @@ export default function CommissionCalculator() {
 								<TableHead>Material Cost</TableHead>
 								<TableHead>Profit</TableHead>
 								<TableHead>Usage Cost</TableHead>
+								<TableHead>Total Usage Cost</TableHead>
 								<TableHead className="text-right"></TableHead>
 							</TableRow>
 						</TableHeader>
@@ -337,6 +347,8 @@ export default function CommissionCalculator() {
 									<TableCell>{formatCurrency(print.materialCost)}</TableCell>
 									<TableCell>{formatCurrency(print.profit)}</TableCell>
 									<TableCell>{formatCurrency(print.usageCost)}</TableCell>
+									<TableCell>{formatCurrency((print.printTime * print.usageCost))}</TableCell>
+
 									<TableCell className="text-right">
 										<div className="flex gap-1 justify-end">
 											<Button onClick={()=> {
@@ -356,14 +368,6 @@ export default function CommissionCalculator() {
 								</TableRow>
 							))}
 						</TableBody>
-						{/*<TableFooter>*/}
-						{/*	<TableRow>*/}
-						{/*		<TableCell>Total</TableCell>*/}
-						{/*		<TableCell>{getTotalPrintTime() +" "+ (getTotalPrintTime() > 1 ? "Hours" : "Hour")} </TableCell>*/}
-						{/*		<TableCell>{formatCurrency(getTotalUsageCost())}</TableCell>*/}
-						{/*		<TableCell className="text-right">{formatCurrency(getTotalMaterialCost())}</TableCell>*/}
-						{/*	</TableRow>*/}
-						{/*</TableFooter>*/}
 					</Table>
 					<hr/>
 					{(printList && printList.length > 0) && (
@@ -373,10 +377,18 @@ export default function CommissionCalculator() {
 								<h3 className="text-2xl font-mono w-full">{getDaysAndHours(getTotalPrintTime())}</h3>
 							</div>
 							<div className="flex flex-row w-full">
-								<h3 className="text-2xl font-mono w-96">Material Price:</h3>
+								<h3 className="text-2xl font-mono w-96">Profit:</h3>
+								<h3 className="text-2xl font-mono w-full">{getTotalProfit()}</h3>
+							</div>
+							<div className="flex flex-row w-full">
+								<h3 className="text-2xl font-mono w-96">Material Cost:</h3>
 								<h3 className="text-2xl font-mono w-full">{getTotalMaterialCost()}</h3>
 							</div>
 							<div className="flex flex-row w-full">
+								<h3 className="text-2xl font-mono w-96">Usage Cost:</h3>
+								<h3 className="text-2xl font-mono w-full">{getTotalUsageCost()}</h3>
+							</div>
+							<div className="flex flex-row w-full mt-5 font-bold">
 								<h3 className="text-2xl font-mono w-96">Total Price:</h3>
 								<h3 className="text-2xl font-mono w-full">{getCommissionPrice()}</h3>
 							</div>
