@@ -8,20 +8,9 @@ import {useToast} from "@/hooks/use-toast";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {formatCurrency, getDaysAndHours} from "@/lib/utils";
 import {ComboBox, ComboboxItem} from "@/components/comboBox";
-
-interface Prints {
-	name: string
-	printTime: number,
-	usageCost: number,
-	materialCost: number,
-	costPerKg: number,
-	usedMaterialGrams: number,
-	profit: number
-}
-interface Package {
-	name: string,
-	price: number
-}
+import {AddEntryDialog} from "./AddEntryDialog";
+import {EditEntryDialog} from "./EditEntryDialog";
+import {PrintEntryData, Prints, Package} from "./printTypes";
 
 const shipingPrices: Package[] = [
 	{
@@ -68,25 +57,38 @@ function shippingComboBox() {
 }
 
 export default function CommissionCalculator() {
-	const [name, setName] = useState<string>("print #1")
-	const [printingTime, setPrintingTime] = useState<string>("1")
-	const [usageCost, setUsageCost] = useState<string>("0.15")
-	const [costPerKg, setCostPerKg] = useState<string>("10")
-	const [usedMaterialGrams, setUsedMaterialGrams] = useState<string>("100")
-	const [profit, setProfit] = useState<string>("0")
 	const [globalProfit, setGlobalProfit] = useState<string>("0")
 	const [shipingCost, setShipingCost] = useState<ComboboxItem>(shippingComboBox()[0])
 	const [customShippingPrice, setCustomShippingPrice] = useState<string>("0")
 	const [printList, setPrintList] = useState<Prints[]>([])
+	const [editingPrint, setEditingPrint] = useState<Prints | null>(null)
 
 	const { toast } = useToast()
 
-	const parseInputs = () => {
-		const time = Number(printingTime.replace(",", "."))
-		const usage = Number(usageCost.replace(",", "."))
-		const kgCost = Number(costPerKg.replace(",", "."))
-		const grams = Number(usedMaterialGrams.replace(",", "."))
-		const _profit = Number(profit.replace(",", "."))
+	const getInitialAddData = (): PrintEntryData => ({
+		name: `print #${printList.length + 1}`,
+		printingTime: "1",
+		costPerKg: "10",
+		usedMaterialGrams: "100",
+		profit: "0",
+		usageCost: "0.15"
+	});
+
+	const getInitialEditData = (print: Prints): PrintEntryData => ({
+		name: print.name,
+		printingTime: String(print.printTime),
+		costPerKg: String(print.costPerKg),
+		usedMaterialGrams: String(print.usedMaterialGrams),
+		profit: String(print.profit),
+		usageCost: String(print.usageCost)
+	});
+
+	const parseInputs = (data: PrintEntryData) => {
+		const time = Number(data.printingTime.replace(",", "."))
+		const usage = Number(data.usageCost.replace(",", "."))
+		const kgCost = Number(data.costPerKg.replace(",", "."))
+		const grams = Number(data.usedMaterialGrams.replace(",", "."))
+		const _profit = Number(data.profit.replace(",", "."))
 
 		if (isNaN(time)) {
 			toast({
@@ -130,92 +132,76 @@ export default function CommissionCalculator() {
 		}
 
 		const material = (kgCost * grams) / 1000;
-		return {time,usage,material,profit: _profit};
+		return {time, usage, material, profit: _profit};
 	}
 
-	const savePrint = () => {
-		if (printList.length > 0) {
-			const index = printList.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
-
-			if (index !== -1) {
-
-				const inputs = parseInputs();
-				if (!inputs) return;
-
-				printList[index] = {
-					name: name,
-					printTime: inputs.time,
-					usageCost: inputs.usage,
-					materialCost: inputs.material,
-					costPerKg: Number(costPerKg),
-					usedMaterialGrams: Number(usedMaterialGrams),
-					profit: inputs.profit
-				};
-				toast({
-					title: "Edited!",
-					description: "Entry has been editted!",
-					variant: "success"
-				});
-				return;
-			} else {
-				toast({
-					title: "Invalid name!",
-					description: "Item with that name does not exist",
-					variant: "error"
-				});
-			}
-		} else {
+	const handleAdd = (data: PrintEntryData) => {
+		if (printList.find(p=>p.name.toLowerCase() === data.name.toLowerCase())) {
 			toast({
-				title: "No entries!",
-				description: "There are no entries in the table!",
+				title: "Invalid name!",
+				description: "Item with that name already exists",
 				variant: "error"
-			});
+			})
+			return;
 		}
-	}
 
-	const addPrint = () => {
-		if (printList.length > 0) {
-			if (printList.find(p=>p.name.toLowerCase() === name.toLowerCase())) {
-				toast({
-					title: "Invalid name!",
-					description: "Item with that name already exists",
-					variant: "error"
-				})
-				return;
-			}
-		}
-		const inputs = parseInputs();
+		const inputs = parseInputs(data);
 		if (!inputs) return;
 
-		const prints:Prints[] = []
-		printList.forEach(p=>prints.push(p))
-
-		prints.push({
-			name: name,
+		const newPrint: Prints = {
+			name: data.name,
 			printTime: inputs.time,
 			usageCost: inputs.usage,
 			materialCost: inputs.material,
-			costPerKg: Number(costPerKg),
-			usedMaterialGrams: Number(usedMaterialGrams),
+			costPerKg: Number(data.costPerKg),
+			usedMaterialGrams: Number(data.usedMaterialGrams),
 			profit: inputs.profit
-		})
-		setPrintList(prints);
-		setName("print #" + (prints.length + 1))
-		setPrintingTime("1")
-		setCostPerKg("10")
-		setUsedMaterialGrams("100")
-		setProfit("0")
+		}
+		setPrintList([...printList, newPrint]);
+		toast({
+			title: "Added!",
+			description: "Entry has been added!",
+			variant: "success"
+		});
+	}
+
+	const handleSave = (data: PrintEntryData) => {
+		if (!editingPrint) return;
+
+		const index = printList.findIndex(p => p.name.toLowerCase() === editingPrint.name.toLowerCase());
+		if (index === -1) {
+			toast({
+				title: "Invalid name!",
+				description: "Item with that name does not exist",
+				variant: "error"
+			});
+			return;
+		}
+
+		const inputs = parseInputs(data);
+		if (!inputs) return;
+
+		const updatedList = [...printList];
+		updatedList[index] = {
+			name: data.name,
+			printTime: inputs.time,
+			usageCost: inputs.usage,
+			materialCost: inputs.material,
+			costPerKg: Number(data.costPerKg),
+			usedMaterialGrams: Number(data.usedMaterialGrams),
+			profit: inputs.profit
+		};
+		setPrintList(updatedList);
+		toast({
+			title: "Saved!",
+			description: "Entry has been updated!",
+			variant: "success"
+		});
 	}
 
 	const reset = () => {
 		setPrintList([])
-		setName("print #0")
-		setPrintingTime("1")
-		setCostPerKg("10")
-		setUsedMaterialGrams("100")
-		setProfit("0")
 		setGlobalProfit("0")
-		setUsageCost("0.15")
 		setShipingCost(shippingComboBox()[0])
 		setCustomShippingPrice("0")
 	}
@@ -235,6 +221,20 @@ export default function CommissionCalculator() {
 		const globalProfitValue = !isNaN(gProfit) && gProfit > 0 ? gProfit : 0;
 		return formatCurrency(printsProfit + globalProfitValue);
 	}
+	function getTotalShipping() {
+		if (shipingCost.value === "Custom") {
+			const customPrice = Number(customShippingPrice.replace(",", "."));
+			if (!isNaN(customPrice) && customPrice > 0) {
+				return customPrice;
+			}
+			// If invalid, treat as 0 (don't set state during render)
+		} else {
+			const pack = shipingPrices.find(pkg => pkg.name === shipingCost.value);
+			if (pack && pack.price > 0) {
+				return pack.price;
+			}
+		}
+	}
 	function getCommissionPrice() : string {
 		if (printList) {
 			let totalCost:number = 0;
@@ -245,18 +245,11 @@ export default function CommissionCalculator() {
 			})
 
 			//Add shipping price
-			if (shipingCost.value === "Custom") {
-				const customPrice = Number(customShippingPrice.replace(",", "."));
-				if (!isNaN(customPrice) && customPrice > 0) {
-					totalCost += customPrice;
-				}
-				// If invalid, treat as 0 (don't set state during render)
-			} else {
-				const pack = shipingPrices.find(pkg => pkg.name === shipingCost.value);
-				if (pack && pack.price > 0) {
-					totalCost += pack.price;
-				}
+			const totalShipping = getTotalShipping();
+			if (totalShipping != undefined) {
+				totalCost += totalShipping;
 			}
+
 
 			//Add global profit
 			const gProfit : number = Number(globalProfit.replace(",", "."));
@@ -270,54 +263,24 @@ export default function CommissionCalculator() {
 		return formatCurrency(0)
 	}
 
+	const totalShipping = getTotalShipping();
+
 	return (
 		<>
 			<div className="flex justify-center flex-0 rounded-xl bg-panel md:min-h-min p-2">
 				<div className="w-full">
 					<h1 className="text-4xl p-4 py-2 text-center">Commission Calculator</h1>
 					<hr/>
-					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
-						<div className="flex flex-col">
-							<Label>Name</Label>
-							<Input onChange={(e) => setName(e.target.value.trim())} value={name}/>
-						</div>
-						<div className="flex flex-col">
-							<Label>Print Time (hours)</Label>
-							<Input onChange={(e) => setPrintingTime(e.target.value.trim().replace(",","."))} value={printingTime}/>
-						</div>
-					</div>
-					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
-						<div className="flex flex-col">
-							<Label>Material cost per 1kg</Label>
-							<Input onChange={(e) => setCostPerKg(e.target.value.trim().replace(",","."))} value={costPerKg}/>
-						</div>
-						<div className="flex flex-col">
-							<Label>Used material (grams)</Label>
-							<Input onChange={(e) => setUsedMaterialGrams(e.target.value.trim().replace(",","."))} value={usedMaterialGrams}/>
-						</div>
-					</div>
-					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
-						<div className="flex flex-col">
-							<Label>Profit</Label>
-							<Input onChange={(e) => setProfit(e.target.value.trim().replace(",","."))} value={profit}/>
-						</div>
-						<div className="flex flex-col">
-							<Label>Usage Cost (per hour)</Label>
-							<Input onChange={(e) => setUsageCost(e.target.value.trim().replace(",","."))} value={usageCost}/>
-						</div>
-					</div>
-					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
-						<div className="flex flex-col mp-0">
-							<Button onClick={addPrint}>Add</Button>
-						</div>
-						<div className="flex flex-col mp-0">
-							<Button onClick={savePrint}>Save</Button>
-						</div>
-					</div>
-					<div className="flex justify-center items-end flex-wrap gap-2 pt-4 p-2">
-						<div className="flex flex-col mp-0">
-							<Button onClick={reset}>Reset Everything</Button>
-						</div>
+					<div className="flex justify-center items-center flex-wrap gap-2 pt-4 p-2">
+
+
+							<AddEntryDialog
+								data={getInitialAddData()}
+								onAdd={handleAdd}
+							>
+								<Button>Add New Entry</Button>
+							</AddEntryDialog>
+						<Button onClick={reset} variant="destructive">Reset Everything</Button>
 					</div>
 				</div>
 			</div>
@@ -351,18 +314,16 @@ export default function CommissionCalculator() {
 
 									<TableCell className="text-right">
 										<div className="flex gap-1 justify-end">
-											<Button onClick={()=> {
-												setName(print.name)
-												setPrintingTime(String(print.printTime))
-												setCostPerKg(String(print.costPerKg))
-												setUsedMaterialGrams(String(print.usedMaterialGrams))
-												setProfit(String(print.profit))
-												setUsageCost(String(print.usageCost))
-											}}>Edit</Button>
+											<EditEntryDialog
+												data={getInitialEditData(print)}
+												onSave={handleSave}
+											>
+												<Button onClick={() => setEditingPrint(print)}>Edit</Button>
+											</EditEntryDialog>
 											<Button onClick={()=> {
 												const prints = printList.filter(p => p.name !== print.name);
 												setPrintList(prints);
-											}}>Remove</Button>
+											}} variant="destructive">Remove</Button>
 										</div>
 									</TableCell>
 								</TableRow>
@@ -380,6 +341,14 @@ export default function CommissionCalculator() {
 								<h3 className="text-2xl font-mono w-96">Profit:</h3>
 								<h3 className="text-2xl font-mono w-full">{getTotalProfit()}</h3>
 							</div>
+							{totalShipping !== undefined && (
+								<div className="flex flex-row w-full">
+									<h3 className="text-2xl font-mono w-96">Shipping:</h3>
+									<h3 className="text-2xl font-mono w-full">
+										{formatCurrency(totalShipping)}
+									</h3>
+								</div>
+							)}
 							<div className="flex flex-row w-full">
 								<h3 className="text-2xl font-mono w-96">Material Cost:</h3>
 								<h3 className="text-2xl font-mono w-full">{getTotalMaterialCost()}</h3>
