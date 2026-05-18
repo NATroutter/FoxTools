@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import {usePathname} from "next/navigation";
-import {Separator} from "@radix-ui/react-menu";
+import { Separator } from "@radix-ui/react-separator";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "@/components/ui/breadcrumb";
 import {findEntryByPath} from "@/config/sidenav";
 import {TitleCase} from "@/lib/utils";
