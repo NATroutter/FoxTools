@@ -4,13 +4,11 @@ export interface PrintEntryData {
 	costPerKg: string;
 	usedMaterialGrams: string;
 	profit: string;
-	usageCost: string;
 }
 
 export interface Prints {
 	name: string;
 	printTime: number;
-	usageCost: number;
 	materialCost: number;
 	costPerKg: number;
 	usedMaterialGrams: number;

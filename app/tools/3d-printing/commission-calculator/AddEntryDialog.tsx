@@ -80,14 +80,6 @@ export function AddEntryDialog({ data, onAdd, children }: AddEntryDialogProps) {
 								value={formData.profit}
 							/>
 						</div>
-						<div className="flex flex-col gap-2">
-							<Label htmlFor="add-usage-cost">Usage Cost (per hour)</Label>
-							<Input
-								id="add-usage-cost"
-								onChange={(e) => setFormData({...formData, usageCost: e.target.value.trim().replace(",",".")})}
-								value={formData.usageCost}
-							/>
-						</div>
 					</div>
 				</div>
 				<DialogFooter>

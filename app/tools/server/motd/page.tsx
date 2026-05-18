@@ -5,7 +5,7 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Code} from "@/components/code";
 
-import * as figlet from 'figlet';
+import figlet from 'figlet';
 import {ComboBox, ComboboxItem} from "@/components/comboBox";
 import {ColorComboBox, ComboBoxColor} from "@/components/colorComboBox";
 

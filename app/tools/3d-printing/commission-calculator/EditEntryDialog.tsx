@@ -80,14 +80,6 @@ export function EditEntryDialog({ data, onSave, children }: EditEntryDialogProps
 							value={formData.profit}
 						/>
 					</div>
-					<div className="flex flex-col gap-2">
-						<Label htmlFor="edit-usage-cost">Usage Cost (per hour)</Label>
-						<Input
-							id="edit-usage-cost"
-							onChange={(e) => setFormData({...formData, usageCost: e.target.value.trim().replace(",",".")})}
-							value={formData.usageCost}
-						/>
-					</div>
 				</div>
 			</div>
 			<DialogFooter>

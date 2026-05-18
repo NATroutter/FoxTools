@@ -12,6 +12,9 @@ import {AddEntryDialog} from "./AddEntryDialog";
 import {EditEntryDialog} from "./EditEntryDialog";
 import {PrintEntryData, Prints, Package} from "./printTypes";
 
+//TODO add session support, show error before add so that data is not lost if there is error adding the entry!
+
+
 const shipingPrices: Package[] = [
 	{
 		name: "Free",
@@ -58,6 +61,8 @@ function shippingComboBox() {
 
 export default function CommissionCalculator() {
 	const [globalProfit, setGlobalProfit] = useState<string>("0")
+	const [electricityCost, setElectricityCost] = useState<string>("0")
+	const [usageCost, setUsageCost] = useState<string>("0.15")
 	const [shipingCost, setShipingCost] = useState<ComboboxItem>(shippingComboBox()[0])
 	const [customShippingPrice, setCustomShippingPrice] = useState<string>("0")
 	const [printList, setPrintList] = useState<Prints[]>([])
@@ -70,8 +75,7 @@ export default function CommissionCalculator() {
 		printingTime: "1",
 		costPerKg: "10",
 		usedMaterialGrams: "100",
-		profit: "0",
-		usageCost: "0.15"
+		profit: "0"
 	});
 
 	const getInitialEditData = (print: Prints): PrintEntryData => ({
@@ -79,13 +83,11 @@ export default function CommissionCalculator() {
 		printingTime: String(print.printTime),
 		costPerKg: String(print.costPerKg),
 		usedMaterialGrams: String(print.usedMaterialGrams),
-		profit: String(print.profit),
-		usageCost: String(print.usageCost)
+		profit: String(print.profit)
 	});
 
 	const parseInputs = (data: PrintEntryData) => {
 		const time = Number(data.printingTime.replace(",", "."))
-		const usage = Number(data.usageCost.replace(",", "."))
 		const kgCost = Number(data.costPerKg.replace(",", "."))
 		const grams = Number(data.usedMaterialGrams.replace(",", "."))
 		const _profit = Number(data.profit.replace(",", "."))
@@ -94,14 +96,6 @@ export default function CommissionCalculator() {
 			toast({
 				title: "Invalid input!",
 				description: "Printing time is not a number",
-				variant: "error"
-			})
-			return undefined;
-		}
-		if (isNaN(usage)) {
-			toast({
-				title: "Invalid input!",
-				description: "Usage cost is not a number",
 				variant: "error"
 			})
 			return undefined;
@@ -132,7 +126,7 @@ export default function CommissionCalculator() {
 		}
 
 		const material = (kgCost * grams) / 1000;
-		return {time, usage, material, profit: _profit};
+		return {time, material, profit: _profit};
 	}
 
 	const handleAdd = (data: PrintEntryData) => {
@@ -151,7 +145,6 @@ export default function CommissionCalculator() {
 		const newPrint: Prints = {
 			name: data.name,
 			printTime: inputs.time,
-			usageCost: inputs.usage,
 			materialCost: inputs.material,
 			costPerKg: Number(data.costPerKg),
 			usedMaterialGrams: Number(data.usedMaterialGrams),
@@ -185,7 +178,6 @@ export default function CommissionCalculator() {
 		updatedList[index] = {
 			name: data.name,
 			printTime: inputs.time,
-			usageCost: inputs.usage,
 			materialCost: inputs.material,
 			costPerKg: Number(data.costPerKg),
 			usedMaterialGrams: Number(data.usedMaterialGrams),
@@ -202,6 +194,8 @@ export default function CommissionCalculator() {
 	const reset = () => {
 		setPrintList([])
 		setGlobalProfit("0")
+		setElectricityCost("0")
+		setUsageCost("0.15")
 		setShipingCost(shippingComboBox()[0])
 		setCustomShippingPrice("0")
 	}
@@ -212,8 +206,20 @@ export default function CommissionCalculator() {
 	function getTotalMaterialCost() {
 		return formatCurrency(printList ? printList.reduce((total, print) => total + print.materialCost, 0) : 0);
 	}
+	function getUsageCost() {
+		const cost = Number(usageCost.replace(",", "."));
+		return !isNaN(cost) && cost > 0 ? cost : 0;
+	}
 	function getTotalUsageCost() {
-		return formatCurrency(printList ? printList.reduce((total, print) => total + (print.printTime * print.usageCost), 0) : 0);
+		return formatCurrency(getTotalPrintTime() * getUsageCost());
+	}
+	function getTotalElectricityCost() {
+		const costPerKwh = Number(electricityCost.replace(",", "."));
+		if (isNaN(costPerKwh) || costPerKwh <= 0) {
+			return 0;
+		}
+
+		return getTotalPrintTime() * (costPerKwh / 100);
 	}
 	function getTotalProfit() {
 		const printsProfit = printList ? printList.reduce((total, print) => total + print.profit, 0) : 0;
@@ -241,7 +247,7 @@ export default function CommissionCalculator() {
 
 			//Sum all prints
 			printList.forEach(print=> {
-				totalCost += ((print.printTime * print.usageCost) + print.materialCost + print.profit);
+				totalCost += ((print.printTime * getUsageCost()) + print.materialCost + print.profit);
 			})
 
 			//Add shipping price
@@ -250,6 +256,8 @@ export default function CommissionCalculator() {
 				totalCost += totalShipping;
 			}
 
+			//Add electricity cost
+			totalCost += getTotalElectricityCost();
 
 			//Add global profit
 			const gProfit : number = Number(globalProfit.replace(",", "."));
@@ -295,8 +303,6 @@ export default function CommissionCalculator() {
 								<TableHead>Material Used</TableHead>
 								<TableHead>Material Cost</TableHead>
 								<TableHead>Profit</TableHead>
-								<TableHead>Usage Cost</TableHead>
-								<TableHead>Total Usage Cost</TableHead>
 								<TableHead className="text-right"></TableHead>
 							</TableRow>
 						</TableHeader>
@@ -309,8 +315,6 @@ export default function CommissionCalculator() {
 									<TableCell>{print.usedMaterialGrams}g</TableCell>
 									<TableCell>{formatCurrency(print.materialCost)}</TableCell>
 									<TableCell>{formatCurrency(print.profit)}</TableCell>
-									<TableCell>{formatCurrency(print.usageCost)}</TableCell>
-									<TableCell>{formatCurrency((print.printTime * print.usageCost))}</TableCell>
 
 									<TableCell className="text-right">
 										<div className="flex gap-1 justify-end">
@@ -357,10 +361,44 @@ export default function CommissionCalculator() {
 								<h3 className="text-2xl font-mono w-96">Usage Cost:</h3>
 								<h3 className="text-2xl font-mono w-full">{getTotalUsageCost()}</h3>
 							</div>
+							<div className="flex flex-row w-full">
+								<h3 className="text-2xl font-mono w-96">Electricity Cost:</h3>
+								<h3 className="text-2xl font-mono w-full">{formatCurrency(getTotalElectricityCost())}</h3>
+							</div>
 							<div className="flex flex-row w-full mt-5 font-bold">
 								<h3 className="text-2xl font-mono w-96">Total Price:</h3>
 								<h3 className="text-2xl font-mono w-full">{getCommissionPrice()}</h3>
 							</div>
+
+
+							<div className="flex justify-start items-end flex-wrap gap-2 pt-10 p-2">
+								<div className="flex flex-col">
+									<Label>Peinter Usage Cost / hour</Label>
+									<Input onChange={(e) => {
+										const value = e.target.value.trim();
+										const num = Number(value.replace(",", "."));
+										if (value === "" || !isNaN(num)) {
+											setUsageCost(value);
+										} else {
+											setUsageCost("0");
+										}
+									}} value={usageCost} />
+								</div>
+								<div className="flex flex-col">
+									<Label>Electricity Cost (c/kWh)</Label>
+									<Input onChange={(e) => {
+										const value = e.target.value.trim();
+										const num = Number(value.replace(",", "."));
+										if (value === "" || !isNaN(num)) {
+											setElectricityCost(value);
+										} else {
+											setElectricityCost("0");
+										}
+									}} value={electricityCost}/>
+								</div>
+							</div>
+
+
 							<div className="flex justify-start items-end flex-wrap gap-2 pt-10 p-2">
 								<div className="flex flex-col">
 									<Label>Profit (Global)</Label>
@@ -372,11 +410,11 @@ export default function CommissionCalculator() {
 										} else {
 											setGlobalProfit("0");
 										}
-									}} value={globalProfit}/>
+									}} value={globalProfit} />
 								</div>
 								<div className="flex flex-col">
 									<Label>Shipping Price</Label>
-									<ComboBox items={shippingComboBox()} onChangeAction={(e) => setShipingCost(e)}/>
+									<ComboBox items={shippingComboBox()} onChangeAction={(e) => setShipingCost(e)} />
 								</div>
 								{shipingCost.value === "Custom" && (
 									<div className="flex flex-col">
@@ -389,10 +427,12 @@ export default function CommissionCalculator() {
 											} else {
 												setCustomShippingPrice("0");
 											}
-										}} value={customShippingPrice}/>
+										}} value={customShippingPrice} />
 									</div>
 								)}
 							</div>
+
+
 						</div>
 					)}
 				</div>
