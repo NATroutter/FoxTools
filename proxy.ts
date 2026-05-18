@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import {isAuthenticated} from "@/lib/auth";
 import {Tools} from "@/config/sidenav";
 
-export async function middleware(request: NextRequest): Promise<NextResponse | void> {
+export async function proxy(request: NextRequest): Promise<NextResponse | void> {
 
 	const url = new URL(request.url)
 
